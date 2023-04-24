@@ -1,0 +1,10 @@
+# ignore any ipynb file as they are for draft only
+*.ipynb
+__pycache__
+
+# ignore reference files
+reference
+
+# ignore working directory files
+.vscode/
+.DS_Store
