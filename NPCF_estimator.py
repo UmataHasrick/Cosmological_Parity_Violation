@@ -145,11 +145,13 @@ def C_Epsilon_Lambda(l1, l2, l3, m1, m2, m3):
 
 
 
-def A_func(l, m, primary_vertices, secondary_vertices, b_min, b_max, weights, average_caculate = False):
+def A_func(l, m, primary_vertices, secondary_vertices, bin, weights_lists, average_caculate = True):
 
     Num_of_vertices = secondary_vertices.shape[0]
     sum = 0
     v_b = 1
+    b_min = bin[0]
+    b_max = bin[1]
 
     relative_position = secondary_vertices - primary_vertices
     relative_position_spherical = Converts_cartesian_to_spherical(relative_position)
@@ -160,7 +162,7 @@ def A_func(l, m, primary_vertices, secondary_vertices, b_min, b_max, weights, av
 
         for j in range(Num_of_vertices): 
             if relative_position_spherical[j][0] < b_max and relative_position_spherical[j][0] > b_min:
-                sum += weights * spe.sph_harm(m, l, relative_position_spherical[j][2], relative_position_spherical[j][1])
+                sum += weights_lists[j] * spe.sph_harm(m, l, relative_position_spherical[j][2], relative_position_spherical[j][1])
 
         v_b = v_b * V_b(b_min, b_max)
 
@@ -170,13 +172,13 @@ def A_func(l, m, primary_vertices, secondary_vertices, b_min, b_max, weights, av
     
         for j in range(Num_of_vertices): 
             if relative_position_spherical[j][0] < b_max and relative_position_spherical[j][0] > b_min:
-                sum += weights * spe.sph_harm(m, l, relative_position_spherical[j][2], relative_position_spherical[j][1])
+                sum += weights_lists * spe.sph_harm(m, l, relative_position_spherical[j][2], relative_position_spherical[j][1])
         
 
         return sum
 
 
-def Estimator(l1, l2, l3, tetrahedron_list, weights):
+def Estimator(l1, l2, l3, tetrahedron_list, weights_lists, bin_lists):
     Vertices = tetrahedron_list.reshape(-1,3)
 
     sum = 0
@@ -186,12 +188,12 @@ def Estimator(l1, l2, l3, tetrahedron_list, weights):
     for l in range(Num_of_vertices):
         primary = Vertices[l]
         secondary = np.delete(Vertices, l, axis = 0)
+        weights_lists_secondary = np.delete(weights_lists, l, axis = 0)
         
         for i in range(-l1, l1+1):
             for j in range(-l2, l2+1):
                 for k in range(-l3, l3+1):
-                    sum_terms = C_Epsilon_Lambda(l1, l2, l3, i, j, k) * A_func(l1, i, primary, secondary, 5, 15, weights) * A_func(l2, j, primary, secondary, 15, 25 , weights) * A_func(l3, k, primary, secondary, 25, 35, weights)
-                    # print("l1 = {0}, l2 = {1}, l3 = {2}, i = {3}, j = {4}, k = {5}, sum_terms = {6}".format(l1, l2, l3, i, j, k, sum_terms))
+                    sum_terms = C_Epsilon_Lambda(l1, l2, l3, i, j, k) * A_func(l1, i, primary, secondary, bin_lists[0], weights_lists_secondary) * A_func(l2, j, primary, secondary, bin_lists[1], weights_lists_secondary) * A_func(l3, k, primary, secondary, bin_lists[2], weights_lists_secondary)
                     sum += sum_terms
                     
     return(sum)
