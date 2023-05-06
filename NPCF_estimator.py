@@ -178,12 +178,15 @@ def A_func(l, m, primary_vertices, secondary_vertices, bin, weights_lists, avera
         return sum
 
 
-def Estimator(l1, l2, l3, tetrahedron_list, weights_lists, bin_lists):
-    Vertices = tetrahedron_list.reshape(-1,3)
-
+def Estimator(l1, l2, l3, Vertices, weights_lists, bin_lists):
+    
+    
     sum = 0
 
     Num_of_vertices = Vertices.shape[0]
+    Num_of_weights = weights_lists.shape[0]
+    
+    assert Num_of_vertices == Num_of_weights
 
     for l in range(Num_of_vertices):
         primary = Vertices[l]
