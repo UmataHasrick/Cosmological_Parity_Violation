@@ -21,8 +21,7 @@ def longitude(x,y):
     length_x = x.shape[0]
     length_y = y.shape[0]
 
-    if length_x != length_y:
-        exit(0)
+    assert length_x == length_y
 
     for i in range(length_x):
         value = m.atan2(y[i],x[i])
@@ -178,26 +177,318 @@ def A_func(l, m, primary_vertices, secondary_vertices, bin, weights_lists, avera
         return sum
 
 
-def Estimator(l1, l2, l3, Vertices, weights_lists, bin_lists):
+def Estimator(l1, l2, l3, Data_catalog, Data_catalog_weights_lists, bin_lists, Random_catalog, Random_catalog_weights_lists, DmR_status):
     
     
     sum = 0
 
-    Num_of_vertices = Vertices.shape[0]
-    Num_of_weights = weights_lists.shape[0]
-    
-    assert Num_of_vertices == Num_of_weights
 
-    for l in range(Num_of_vertices):
-        primary = Vertices[l]
-        secondary = np.delete(Vertices, l, axis = 0)
-        weights_lists_secondary = np.delete(weights_lists, l, axis = 0)
+    if DmR_status == 0:
+        # DDDD
+        Num_of_Data_catalog = Data_catalog.shape[0]
+        Num_of_weights = Data_catalog_weights_lists.shape[0]
         
-        for i in range(-l1, l1+1):
-            for j in range(-l2, l2+1):
-                for k in range(-l3, l3+1):
-                    sum_terms = C_Epsilon_Lambda(l1, l2, l3, i, j, k) * A_func(l1, i, primary, secondary, bin_lists[0], weights_lists_secondary) * A_func(l2, j, primary, secondary, bin_lists[1], weights_lists_secondary) * A_func(l3, k, primary, secondary, bin_lists[2], weights_lists_secondary)
-                    sum += sum_terms
+        assert Num_of_Data_catalog == Num_of_weights
+
+        for l in range(Num_of_Data_catalog):
+            primary = Data_catalog[l]
+            secondary = np.delete(Data_catalog, l, axis = 0)
+            weights_primary = Data_catalog_weights_lists[l]
+            weights_lists_secondary = np.delete(Data_catalog_weights_lists, l, axis = 0)
+            
+            for i in range(-l1, l1+1):
+                for j in range(-l2, l2+1):
+                    for k in range(-l3, l3+1):
+                        sum_terms = weights_primary * C_Epsilon_Lambda(l1, l2, l3, i, j, k) * A_func(l1, i, primary, secondary, bin_lists[0], weights_lists_secondary) * A_func(l2, j, primary, secondary, bin_lists[1], weights_lists_secondary) * A_func(l3, k, primary, secondary, bin_lists[2], weights_lists_secondary)
+                        sum += sum_terms
                     
+    elif DmR_status == 1:
+        # DDDR
+        Num_of_Data_catalog = Data_catalog.shape[0]
+        Num_of_weights = Data_catalog_weights_lists.shape[0]
+        
+        assert Num_of_Data_catalog == Num_of_weights
+
+        for l in range(Num_of_Data_catalog):
+            primary = Data_catalog[l]
+            secondary = np.delete(Data_catalog, l, axis = 0)
+            weights_primary = Data_catalog_weights_lists[l]
+            weights_lists_secondary = np.delete(Data_catalog_weights_lists, l, axis = 0)
+            
+            for i in range(-l1, l1+1):
+                for j in range(-l2, l2+1):
+                    for k in range(-l3, l3+1):
+                        sum_terms = weights_primary * C_Epsilon_Lambda(l1, l2, l3, i, j, k) * A_func(l1, i, primary, secondary, bin_lists[0], weights_lists_secondary) * A_func(l2, j, primary, secondary, bin_lists[1], weights_lists_secondary) * A_func(l3, k, primary, Random_catalog, bin_lists[2], Random_catalog_weights_lists)
+                        sum += sum_terms
+
+    elif DmR_status == 2:
+        # DDRD
+        Num_of_Data_catalog = Data_catalog.shape[0]
+        Num_of_weights = Data_catalog_weights_lists.shape[0]
+        
+        assert Num_of_Data_catalog == Num_of_weights
+
+        for l in range(Num_of_Data_catalog):
+            primary = Data_catalog[l]
+            secondary = np.delete(Data_catalog, l, axis = 0)
+            weights_primary = Data_catalog_weights_lists[l]
+            weights_lists_secondary = np.delete(Data_catalog_weights_lists, l, axis = 0)
+            
+            for i in range(-l1, l1+1):
+                for j in range(-l2, l2+1):
+                    for k in range(-l3, l3+1):
+                        sum_terms = weights_primary * C_Epsilon_Lambda(l1, l2, l3, i, j, k) * A_func(l1, i, primary, secondary, bin_lists[0], weights_lists_secondary) * A_func(l2, j, primary, Random_catalog, bin_lists[1], Random_catalog_weights_lists) * A_func(l3, k, primary, secondary, bin_lists[2], weights_lists_secondary)
+                        sum += sum_terms
+    
+    elif DmR_status == 3:
+        # DRDD
+        Num_of_Data_catalog = Data_catalog.shape[0]
+        Num_of_weights = Data_catalog_weights_lists.shape[0]
+        
+        assert Num_of_Data_catalog == Num_of_weights
+
+        for l in range(Num_of_Data_catalog):
+            primary = Data_catalog[l]
+            secondary = np.delete(Data_catalog, l, axis = 0)
+            weights_primary = Data_catalog_weights_lists[l]
+            weights_lists_secondary = np.delete(Data_catalog_weights_lists, l, axis = 0)
+            
+            for i in range(-l1, l1+1):
+                for j in range(-l2, l2+1):
+                    for k in range(-l3, l3+1):
+                        sum_terms = weights_primary * C_Epsilon_Lambda(l1, l2, l3, i, j, k) * A_func(l1, i, primary, Random_catalog, bin_lists[0], Random_catalog_weights_lists) * A_func(l2, j, primary, secondary, bin_lists[1], weights_lists_secondary) * A_func(l3, k, primary, secondary, bin_lists[2], weights_lists_secondary)
+                        sum += sum_terms
+                        
+    elif DmR_status == 4:
+        # RDDD
+        Num_of_Random_catalog = Random_catalog.shape[0]
+        Num_of_weights = Random_catalog_weights_lists.shape[0]
+        
+        assert Num_of_Random_catalog == Num_of_weights
+
+        for l in range(Num_of_Random_catalog):
+            primary = Random_catalog[l]
+            secondary = np.delete(Random_catalog, l, axis = 0)
+            weights_primary = Random_catalog_weights_lists[l]
+            weights_lists_secondary = np.delete(Random_catalog_weights_lists, l, axis = 0)
+            
+            for i in range(-l1, l1+1):
+                for j in range(-l2, l2+1):
+                    for k in range(-l3, l3+1):
+                        sum_terms = weights_primary * C_Epsilon_Lambda(l1, l2, l3, i, j, k) * A_func(l1, i, primary, Data_catalog, bin_lists[0], Data_catalog_weights_lists) * A_func(l2, j, primary, Data_catalog, bin_lists[1], Data_catalog_weights_lists) * A_func(l3, k, primary, Data_catalog, bin_lists[2], Data_catalog_weights_lists)
+                        sum += sum_terms
+                        
+    elif DmR_status == 5:
+        # DDRR
+        Num_of_Data_catalog = Data_catalog.shape[0]
+        Num_of_weights = Data_catalog_weights_lists.shape[0]
+        
+        assert Num_of_Data_catalog == Num_of_weights
+
+        for l in range(Num_of_Data_catalog):
+            primary = Data_catalog[l]
+            secondary = np.delete(Data_catalog, l, axis = 0)
+            weights_primary = Data_catalog_weights_lists[l]
+            weights_lists_secondary = np.delete(Data_catalog_weights_lists, l, axis = 0)
+            
+            for i in range(-l1, l1+1):
+                for j in range(-l2, l2+1):
+                    for k in range(-l3, l3+1):
+                        sum_terms = weights_primary * C_Epsilon_Lambda(l1, l2, l3, i, j, k) * A_func(l1, i, primary, secondary, bin_lists[0], weights_lists_secondary) * A_func(l2, j, primary, Random_catalog, bin_lists[1], Random_catalog_weights_lists) * A_func(l3, k, primary, Random_catalog, bin_lists[2], Random_catalog_weights_lists)
+                        sum += sum_terms
+                        
+                        
+    elif DmR_status == 6:
+        # DRRD
+        Num_of_Data_catalog = Data_catalog.shape[0]
+        Num_of_weights = Data_catalog_weights_lists.shape[0]
+        
+        assert Num_of_Data_catalog == Num_of_weights
+
+        for l in range(Num_of_Data_catalog):
+            primary = Data_catalog[l]
+            secondary = np.delete(Data_catalog, l, axis = 0)
+            weights_primary = Data_catalog_weights_lists[l]
+            weights_lists_secondary = np.delete(Data_catalog_weights_lists, l, axis = 0)
+            
+            for i in range(-l1, l1+1):
+                for j in range(-l2, l2+1):
+                    for k in range(-l3, l3+1):
+                        sum_terms = weights_primary * C_Epsilon_Lambda(l1, l2, l3, i, j, k) * A_func(l1, i, primary, Random_catalog, bin_lists[0], Random_catalog_weights_lists) * A_func(l2, j, primary, Random_catalog, bin_lists[1], Random_catalog_weights_lists) * A_func(l3, k, primary, secondary, bin_lists[2], weights_lists_secondary)
+                        sum += sum_terms
+                        
+                        
+    elif DmR_status == 7:
+        # DRDR
+        Num_of_Data_catalog = Data_catalog.shape[0]
+        Num_of_weights = Data_catalog_weights_lists.shape[0]
+        
+        assert Num_of_Data_catalog == Num_of_weights
+
+        for l in range(Num_of_Data_catalog):
+            primary = Data_catalog[l]
+            secondary = np.delete(Data_catalog, l, axis = 0)
+            weights_primary = Data_catalog_weights_lists[l]
+            weights_lists_secondary = np.delete(Data_catalog_weights_lists, l, axis = 0)
+            
+            for i in range(-l1, l1+1):
+                for j in range(-l2, l2+1):
+                    for k in range(-l3, l3+1):
+                        sum_terms = weights_primary * C_Epsilon_Lambda(l1, l2, l3, i, j, k) * A_func(l1, i, primary, Random_catalog, bin_lists[0], Random_catalog_weights_lists) * A_func(l2, j, primary, secondary, bin_lists[1], weights_lists_secondary) * A_func(l3, k, primary, Random_catalog, bin_lists[2], Random_catalog_weights_lists)
+                        sum += sum_terms
+                        
+                        
+    elif DmR_status == 8:
+        # RRDD
+        Num_of_Random_catalog = Random_catalog.shape[0]
+        Num_of_weights = Random_catalog_weights_lists.shape[0]
+        
+        assert Num_of_Random_catalog == Num_of_weights
+
+        for l in range(Num_of_Random_catalog):
+            primary = Random_catalog[l]
+            secondary = np.delete(Random_catalog, l, axis = 0)
+            weights_primary = Random_catalog_weights_lists[l]
+            weights_lists_secondary = np.delete(Random_catalog_weights_lists, l, axis = 0)
+            
+            for i in range(-l1, l1+1):
+                for j in range(-l2, l2+1):
+                    for k in range(-l3, l3+1):
+                        sum_terms = weights_primary * C_Epsilon_Lambda(l1, l2, l3, i, j, k) * A_func(l1, i, primary, secondary, bin_lists[0], weights_lists_secondary) * A_func(l2, j, primary, Data_catalog, bin_lists[1], Data_catalog_weights_lists) * A_func(l3, k, primary, Data_catalog, bin_lists[2], Data_catalog_weights_lists)
+                        sum += sum_terms
+                        
+    elif DmR_status == 9:
+        # RDRD
+        Num_of_Random_catalog = Random_catalog.shape[0]
+        Num_of_weights = Random_catalog_weights_lists.shape[0]
+        
+        assert Num_of_Random_catalog == Num_of_weights
+
+        for l in range(Num_of_Random_catalog):
+            primary = Random_catalog[l]
+            secondary = np.delete(Random_catalog, l, axis = 0)
+            weights_primary = Random_catalog_weights_lists[l]
+            weights_lists_secondary = np.delete(Random_catalog_weights_lists, l, axis = 0)
+            
+            for i in range(-l1, l1+1):
+                for j in range(-l2, l2+1):
+                    for k in range(-l3, l3+1):
+                        sum_terms = weights_primary * C_Epsilon_Lambda(l1, l2, l3, i, j, k) * A_func(l1, i, primary, Data_catalog, bin_lists[0], Data_catalog_weights_lists) * A_func(l2, j, primary, secondary, bin_lists[1], weights_lists_secondary) * A_func(l3, k, primary, Data_catalog, bin_lists[2], Data_catalog_weights_lists)
+                        sum += sum_terms
+    
+    elif DmR_status == 10:
+        # RDDR
+        Num_of_Random_catalog = Random_catalog.shape[0]
+        Num_of_weights = Random_catalog_weights_lists.shape[0]
+        
+        assert Num_of_Random_catalog == Num_of_weights
+
+        for l in range(Num_of_Random_catalog):
+            primary = Random_catalog[l]
+            secondary = np.delete(Random_catalog, l, axis = 0)
+            weights_primary = Random_catalog_weights_lists[l]
+            weights_lists_secondary = np.delete(Random_catalog_weights_lists, l, axis = 0)
+            
+            for i in range(-l1, l1+1):
+                for j in range(-l2, l2+1):
+                    for k in range(-l3, l3+1):
+                        sum_terms = weights_primary * C_Epsilon_Lambda(l1, l2, l3, i, j, k) * A_func(l1, i, primary, secondary, bin_lists[0], weights_lists_secondary) * A_func(l2, j, primary, Data_catalog, bin_lists[1], Data_catalog_weights_lists) * A_func(l3, k, primary, Data_catalog, bin_lists[2], Data_catalog_weights_lists)
+                        sum += sum_terms
+    
+    elif DmR_status == 11:
+        # DRRR
+        Num_of_Data_catalog = Data_catalog.shape[0]
+        Num_of_weights = Data_catalog_weights_lists.shape[0]
+        
+        assert Num_of_Data_catalog == Num_of_weights
+
+        for l in range(Num_of_Data_catalog):
+            primary = Data_catalog[l]
+            secondary = np.delete(Data_catalog, l, axis = 0)
+            weights_primary = Data_catalog_weights_lists[l]
+            weights_lists_secondary = np.delete(Data_catalog_weights_lists, l, axis = 0)
+            
+            for i in range(-l1, l1+1):
+                for j in range(-l2, l2+1):
+                    for k in range(-l3, l3+1):
+                        sum_terms = weights_primary * C_Epsilon_Lambda(l1, l2, l3, i, j, k) * A_func(l1, i, primary, Random_catalog, bin_lists[0], Random_catalog_weights_lists) * A_func(l2, j, primary, Random_catalog, bin_lists[1], Random_catalog_weights_lists) * A_func(l3, k, primary, Random_catalog, bin_lists[2], Random_catalog_weights_lists)
+                        sum += sum_terms
+                        
+    elif DmR_status == 12:
+        # RDRR
+        Num_of_Random_catalog = Random_catalog.shape[0]
+        Num_of_weights = Random_catalog_weights_lists.shape[0]
+        
+        assert Num_of_Random_catalog == Num_of_weights
+
+        for l in range(Num_of_Random_catalog):
+            primary = Random_catalog[l]
+            secondary = np.delete(Random_catalog, l, axis = 0)
+            weights_primary = Random_catalog_weights_lists[l]
+            weights_lists_secondary = np.delete(Random_catalog_weights_lists, l, axis = 0)
+            
+            for i in range(-l1, l1+1):
+                for j in range(-l2, l2+1):
+                    for k in range(-l3, l3+1):
+                        sum_terms = weights_primary * C_Epsilon_Lambda(l1, l2, l3, i, j, k) * A_func(l1, i, primary, Data_catalog, bin_lists[0], Data_catalog_weights_lists) * A_func(l2, j, primary, secondary, bin_lists[1], weights_lists_secondary) * A_func(l3, k, primary, secondary, bin_lists[2], weights_lists_secondary)
+                        sum += sum_terms
+                        
+    elif DmR_status == 13:
+        # RRDR
+        Num_of_Random_catalog = Random_catalog.shape[0]
+        Num_of_weights = Random_catalog_weights_lists.shape[0]
+        
+        assert Num_of_Random_catalog == Num_of_weights
+
+        for l in range(Num_of_Random_catalog):
+            primary = Random_catalog[l]
+            secondary = np.delete(Random_catalog, l, axis = 0)
+            weights_primary = Random_catalog_weights_lists[l]
+            weights_lists_secondary = np.delete(Random_catalog_weights_lists, l, axis = 0)
+            
+            for i in range(-l1, l1+1):
+                for j in range(-l2, l2+1):
+                    for k in range(-l3, l3+1):
+                        sum_terms = weights_primary * C_Epsilon_Lambda(l1, l2, l3, i, j, k) * A_func(l1, i, primary, secondary, bin_lists[0], weights_lists_secondary) * A_func(l2, j, primary, Data_catalog, bin_lists[1], Data_catalog_weights_lists) * A_func(l3, k, primary, secondary, bin_lists[2], weights_lists_secondary)
+                        sum += sum_terms
+                        
+    elif DmR_status == 14:
+        # RRRD
+        Num_of_Random_catalog = Random_catalog.shape[0]
+        Num_of_weights = Random_catalog_weights_lists.shape[0]
+        
+        assert Num_of_Random_catalog == Num_of_weights
+
+        for l in range(Num_of_Random_catalog):
+            primary = Random_catalog[l]
+            secondary = np.delete(Random_catalog, l, axis = 0)
+            weights_primary = Random_catalog_weights_lists[l]
+            weights_lists_secondary = np.delete(Random_catalog_weights_lists, l, axis = 0)
+            
+            for i in range(-l1, l1+1):
+                for j in range(-l2, l2+1):
+                    for k in range(-l3, l3+1):
+                        sum_terms = weights_primary * C_Epsilon_Lambda(l1, l2, l3, i, j, k) * A_func(l1, i, primary, secondary, bin_lists[0], weights_lists_secondary) * A_func(l2, j, primary, secondary, bin_lists[1], weights_lists_secondary) * A_func(l3, k, primary, Data_catalog, bin_lists[2], Data_catalog_weights_lists)
+                        sum += sum_terms
+    
+    elif DmR_status == 15:
+        # RRRR
+        Num_of_Random_catalog = Random_catalog.shape[0]
+        Num_of_weights = Random_catalog_weights_lists.shape[0]
+        
+        assert Num_of_Random_catalog == Num_of_weights
+
+        for l in range(Num_of_Random_catalog):
+            primary = Random_catalog[l]
+            secondary = np.delete(Random_catalog, l, axis = 0)
+            weights_primary = Random_catalog_weights_lists[l]
+            weights_lists_secondary = np.delete(Random_catalog_weights_lists, l, axis = 0)
+            
+            for i in range(-l1, l1+1):
+                for j in range(-l2, l2+1):
+                    for k in range(-l3, l3+1):
+                        sum_terms = weights_primary * C_Epsilon_Lambda(l1, l2, l3, i, j, k) * A_func(l1, i, primary, secondary, bin_lists[0], weights_lists_secondary) * A_func(l2, j, primary, secondary, bin_lists[1], weights_lists_secondary) * A_func(l3, k, primary, secondary, bin_lists[2], weights_lists_secondary)
+                        sum += sum_terms
+                        
     return(sum)
 
