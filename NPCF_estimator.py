@@ -34,8 +34,6 @@ def longitude(x,y):
     return output
 
 
-
-
 def Converts_cartesian_to_spherical(r_cartesian):
     
     """The function can convert the list of the position(s) of the point(s) in cartesian form into spherical form with in range [0,Infinity), [0,PI) and [0,2*PI)
@@ -59,8 +57,6 @@ def Converts_cartesian_to_spherical(r_cartesian):
     return np.transpose(np.nan_to_num(np.array([r, theta, phi])))
 
 
-
-
 def bin_func(x, bin_min, bin_max):
     
     """The function can serve as a bin function to distinguish whether the input is within the bin.
@@ -80,8 +76,6 @@ def bin_func(x, bin_min, bin_max):
         return 0
     
 
-
-
 def sphere_volumn(r):
     
     """The function can calculate the volumn of a sphere of given radius. 
@@ -94,8 +88,6 @@ def sphere_volumn(r):
     """
     
     return (4 * np.pi * r ** 3) / 3
-
-
 
 
 def V_b(bin_min, bin_max):
@@ -111,8 +103,6 @@ def V_b(bin_min, bin_max):
     """
     
     return sphere_volumn(bin_max) - sphere_volumn(bin_min)
-
-
 
 
 def wigner_3j(l1, l2, l3, m1, m2, m3):
@@ -136,15 +126,11 @@ def wigner_3j(l1, l2, l3, m1, m2, m3):
         return value_list[index]
     
 
-
-
 def C_Epsilon_Lambda(l1, l2, l3, m1, m2, m3):
     return wigner_3j(l1, l2, l3, m1, m2, m3)
 
 
-
-
-def A_func(l, m, primary_vertices, secondary_vertices, bin, weights_lists, average_caculate = True):
+def A_func(l, m, primary_vertices, secondary_vertices, bin, weights_lists, average_caculate = True, configuration_space_average = False):
 
     Num_of_vertices = secondary_vertices.shape[0]
     sum = 0
@@ -157,27 +143,57 @@ def A_func(l, m, primary_vertices, secondary_vertices, bin, weights_lists, avera
 
     # print(relative_position_spherical)
 
-    if average_caculate == True:
+    if (average_caculate == True) and (configuration_space_average == True):
 
         for j in range(Num_of_vertices): 
             if relative_position_spherical[j][0] < b_max and relative_position_spherical[j][0] > b_min:
                 sum += weights_lists[j] * spe.sph_harm(m, l, relative_position_spherical[j][2], relative_position_spherical[j][1])
+                # print(sum)
+
+        v_b = v_b * V_b(b_min, b_max)
+
+        return sum / v_b
+    
+    elif (average_caculate == True) and (configuration_space_average == False):
+        
+        for j in range(Num_of_vertices): 
+            if relative_position_spherical[j][0] < b_max and relative_position_spherical[j][0] > b_min:
+                sum += relative_position_spherical[j][0] * weights_lists[j] * spe.sph_harm(m, l, relative_position_spherical[j][2], relative_position_spherical[j][1])
+                # print(sum)
 
         v_b = v_b * V_b(b_min, b_max)
 
         return sum / v_b
         
+    elif (average_caculate == False) and (configuration_space_average == False):
+        
+        for j in range(Num_of_vertices): 
+            if relative_position_spherical[j][0] < b_max and relative_position_spherical[j][0] > b_min:
+                sum += relative_position_spherical[j][0] * weights_lists[j] * spe.sph_harm(m, l, relative_position_spherical[j][2], relative_position_spherical[j][1])
+                # print(sum)
+                
+        v_b = V_b(b_min, b_max)
+
+        return sum
+        
     else:
     
         for j in range(Num_of_vertices): 
             if relative_position_spherical[j][0] < b_max and relative_position_spherical[j][0] > b_min:
-                sum += weights_lists * spe.sph_harm(m, l, relative_position_spherical[j][2], relative_position_spherical[j][1])
-        
+                sum += weights_lists[j] * spe.sph_harm(m, l, relative_position_spherical[j][2], relative_position_spherical[j][1])
+                # print(sum)
 
         return sum
 
 
-def Estimator(l1, l2, l3, Data_catalog, Data_catalog_weights_lists, bin_lists, Random_catalog, Random_catalog_weights_lists, DmR_status):
+def cache_IO(cache_file, information, num, IO_status, flag = 'a'):
+    
+    if IO_status == 0:
+        IO_file = open(cache_file,flag)
+        print(str(num)+"\t"+information, file = IO_file)
+    
+    
+def Estimator(l1, l2, l3, Data_catalog, Data_catalog_weights_lists, bin_lists, Random_catalog, Random_catalog_weights_lists, DmR_status, space_volume,  cache_flag = 0, average_calculate = True, configuration_space_average = False):
     
     
     sum = 0
@@ -199,7 +215,7 @@ def Estimator(l1, l2, l3, Data_catalog, Data_catalog_weights_lists, bin_lists, R
             for i in range(-l1, l1+1):
                 for j in range(-l2, l2+1):
                     for k in range(-l3, l3+1):
-                        sum_terms = weights_primary * C_Epsilon_Lambda(l1, l2, l3, i, j, k) * A_func(l1, i, primary, secondary, bin_lists[0], weights_lists_secondary) * A_func(l2, j, primary, secondary, bin_lists[1], weights_lists_secondary) * A_func(l3, k, primary, secondary, bin_lists[2], weights_lists_secondary)
+                        sum_terms = weights_primary * C_Epsilon_Lambda(l1, l2, l3, i, j, k) * A_func(l1, i, primary, secondary, bin_lists[0], weights_lists_secondary,configuration_space_average=configuration_space_average, average_caculate=average_calculate) * A_func(l2, j, primary, secondary, bin_lists[1], weights_lists_secondary, configuration_space_average=configuration_space_average, average_caculate=average_calculate) * A_func(l3, k, primary, secondary, bin_lists[2], weights_lists_secondary, configuration_space_average=configuration_space_average, average_caculate=average_calculate)
                         sum += sum_terms
                     
     elif DmR_status == 1:
@@ -489,6 +505,6 @@ def Estimator(l1, l2, l3, Data_catalog, Data_catalog_weights_lists, bin_lists, R
                     for k in range(-l3, l3+1):
                         sum_terms = weights_primary * C_Epsilon_Lambda(l1, l2, l3, i, j, k) * A_func(l1, i, primary, secondary, bin_lists[0], weights_lists_secondary) * A_func(l2, j, primary, secondary, bin_lists[1], weights_lists_secondary) * A_func(l3, k, primary, secondary, bin_lists[2], weights_lists_secondary)
                         sum += sum_terms
-                        
-    return(sum)
+               
+    return(sum/space_volume)
 
