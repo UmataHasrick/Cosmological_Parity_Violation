@@ -130,7 +130,7 @@ def C_Epsilon_Lambda(l1, l2, l3, m1, m2, m3):
     return wigner_3j(l1, l2, l3, m1, m2, m3)
 
 
-def A_func(l, m, primary_vertices, secondary_vertices, bin, weights_lists, average_caculate = True, configuration_space_average = False):
+def A_func(l, m, primary_vertices, secondary_vertices, bin, weights_lists, average_caculate = True, configuration_space_average = True):
 
     Num_of_vertices = secondary_vertices.shape[0]
     sum = 0
